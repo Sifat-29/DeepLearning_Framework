@@ -24,6 +24,7 @@ Some of the major optimisations I made:
 
 *   **Memory Recycling:** In the training loop, intermediate tensors (predictions, gradients of hidden layers) are allocated and freed immediately within the cycle. I ensured zero memory leaks by carefully tracking pointer ownership, keeping the memory footprint minimal even for large datasets.
 *   **In-Place Operations:** To reduce the overhead of `malloc`/`free`, I implemented in-place mathematical operations (e.g., `tensor_add_scaled_inplace`) for the optimizer steps, modifying weights directly in memory rather than creating new tensor copies.
+*   **Matrix Multiplication Optimisation:** Transposed one of the matrix to execute the matrix multiplication so that both traversals are in row-major order. This improved cache locality and thus improved runtime by approximately 20%.
 *   **Numerical Stability:** I implemented **He Initialisation** (`sqrt(6/n)`) for weights to solve the "Dying ReLU" problem, where gradients would vanish, and the network would stop learning.
 *   **Mini-Batch Processing:** Initially, I trained using Stochastic Gradient Descent (Batch Size = 1). By refactoring the math to support Matrix-Matrix multiplication (Batch Size = 64), I drastically improved training speed and CPU cache utilisation.
 
