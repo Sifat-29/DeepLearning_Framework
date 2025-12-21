@@ -219,12 +219,12 @@ Tensor* tensor_subtraction(const Tensor* t1, const Tensor* t2) {
 /**
  * Returns a new Tensor (t1->rows x t2->cols) which is the result of matrix multiplication of t1 and t2 (t1 @ t2).
  * Returns NULL if the number of cols of t1 and rows of t2 do not match.
- * Simple Matrix multiplication (will optimise later)
+ * Simple Matrix multiplication (not in use now)
  * 
  * @param t1 the first tensor
  * @param t2 the second tensor
  */
-Tensor* tensor_multiplication(const Tensor* t1, const Tensor* t2) {
+Tensor* tensor_multiplication_v1(const Tensor* t1, const Tensor* t2) {
     if (!t1 || !t2) {
         if (!t1) printf("t1 is NULL\n");
         if (!t2) printf("t2 is NULL\n");
@@ -243,6 +243,48 @@ Tensor* tensor_multiplication(const Tensor* t1, const Tensor* t2) {
     }  
 
     return t_new;
+}
+
+
+
+/**
+ * Returns a new Tensor (t1->rows x t2->cols) which is the result of matrix multiplication of t1 and t2 (t1 @ t2).
+ * Returns NULL if the number of cols of t1 and rows of t2 do not match.
+ * Optimised (still O(n^3) but much better caching, reduced time by 20%!!!)
+ * 
+ * @param t1 the first tensor
+ * @param t2 the second tensor
+ */
+Tensor* tensor_multiplication(const Tensor* t1, const Tensor* t2) {
+    if (!t1 || !t2) {
+        if (!t1) printf("t1 is NULL\n");
+        if (!t2) printf("t2 is NULL\n");
+        return NULL;
+    }
+
+    if (t1->cols != t2->rows) {
+        if (t1->cols != t2->rows) printf("The number of cols of t1 and rows of t2 do not match\n");
+        return NULL;
+    }
+
+    Tensor* result = create_tensor_value(t1->rows, t2->cols, 0.0f);
+    
+    // OPTIMISATION: Using transposed copy of t2
+    // This is to traverse both t1 and t2_t in row-major order (sequentially).
+    Tensor* t2_t = tensor_transpose(t2); 
+
+    for (int i = 0; i < t1->rows; i++) {
+        for (int j = 0; j < t2->cols; j++) {
+            float sum = 0.0f;
+            for (int k = 0; k < t1->cols; k++) {
+                sum += t1->data[i * t1->cols + k] * t2_t->data[j * t2_t->cols + k];
+            }
+            result->data[i * result->cols + j] = sum;
+        }
+    }
+
+    free_tensor(&t2_t);
+    return result;
 }
 
 
