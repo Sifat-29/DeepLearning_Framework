@@ -7,6 +7,71 @@ This is a highly modular deep learning library built completely in pure C withou
 
 <img width="1310" height="688" alt="Screenshot 2025-12-22 040650" src="https://github.com/user-attachments/assets/2cf67ef2-05d7-47f3-a426-f19b0f8fd26a" />
 
+## How to Use
+
+Follow these steps to set up the environment, download the necessary data and run the MNIST classification demo to verify.
+
+### Build the Library
+Run the make command in the root directory.
+```bash
+make
+```
+
+### Data Setup
+This framework requires the MNIST dataset in **CSV format** to run the built-in test.
+
+**Download the Dataset:** Go to [MNIST in CSV on Kaggle](https://www.kaggle.com/datasets/oddrationale/mnist-in-csv) and download the archive.
+**Create Directory:** Create a directory named `datasets` in the root of this project. Then a directory name `MNIST` inside it.
+**Extract & Rename:** Extract the files into the `MNIST/` folder and ensure they are named exactly as follows: `mnist_train.csv` (The training data) and `mnist_test.csv` (The testing data)
+
+The directory structure should look like this:
+```text
+DeepLearning_Framework/
+├── bin/
+├── src/
+├── ...
+└── datasets/
+           ├──MNIST/
+                  ├── mnist_train.csv
+                  ├── mnist_test.csv
+```
+
+### Run the MNIST Demo
+Once the data is in place, execute the neural network binary:
+```bash
+./bin/neural_net
+```
+You should see the network initialize, load the CSV data, and begin training. Accuracy typically reaches **~97-98%** within a few minutes on a standard CPU.
+
+---
+
+## Using the API in Your Own Code
+To use this framework in your own projects, simply include the headers. **Note:** You must call `init_tensor_api()` at the very start of your program.
+
+```c
+#include "network.h"
+
+int main() {
+    // Initialize the library
+    init_tensor_api();
+
+    // Define Network Architecture
+    // Inputs: 784 (MNIST), Loss: MSE, Optimizer: SGD, Learning Rate: 0.1
+    Network* net = create_network(784, MSE, SGD, 0.1f);
+
+    // Add Layers
+    network_add_layer(net, 256, RELU);   // Hidden Layer
+    network_add_layer(net, 10, LINEAR);  // Output Layer
+
+    // Train (Assuming x_train/y_train are loaded tensors)
+    network_train(net, x_train, y_train, batches, epochs);
+
+    // Cleanup
+    free_network(&net);
+    return 0;
+}
+```
+
 ## How It's Made:
 
 **Tech used:** C (Standard C99), GCC, Makefile
