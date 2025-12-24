@@ -117,4 +117,5 @@ Implementing He Initialisation, having positive biases initially  and having LIN
 * Implement Network saving/retrieving functionality
 
 ### Runtime Optimisation
+* Implement a thread pool api and use it for matrix multiplication (used gprof to ascertain that matrix multiplication is the biggest bottleneck, not my initial belief of malloc/free calls).
 * Optimise runtime even more by adding buffers to reduce malloc/free calls
